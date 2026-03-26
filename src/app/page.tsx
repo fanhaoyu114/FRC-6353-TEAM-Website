@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { createPortal } from 'react-dom'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
@@ -166,6 +167,42 @@ function DetailItem({
   )
 }
 
+// Image Preview Component
+function ImagePreview({ src, alt }: { src: string; alt: string }) {
+  const content = (
+    <motion.div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      {/* Image */}
+      <motion.div
+        className="relative z-10 rounded-xl overflow-hidden shadow-2xl"
+        initial={{ scale: 0.5, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.5, opacity: 0 }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      >
+        <Image 
+          src={src} 
+          alt={alt}
+          width={800}
+          height={600}
+          className="max-w-[85vw] max-h-[85vh] object-contain rounded-lg"
+          unoptimized
+        />
+      </motion.div>
+    </motion.div>
+  )
+  
+  if (typeof window === 'undefined') return null
+  return createPortal(content, document.body)
+}
+
 // Terminal Card Component
 function TerminalCard({ 
   terminal, 
@@ -185,6 +222,7 @@ function TerminalCard({
   images?: string[]
 }) {
   const [isActive, setIsActive] = useState(false)
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null)
 
   const colorMap: Record<string, { indicator: string; icon: string; header: string }> = {
     'cyan-500': { indicator: 'bg-cyan-400', icon: 'text-cyan-500', header: 'text-cyan-600' },
@@ -239,11 +277,13 @@ function TerminalCard({
                 <div 
                   key={i}
                   className={`
-                    w-20 h-20 rounded-lg overflow-hidden transition-all duration-300
+                    w-20 h-20 rounded-lg overflow-hidden transition-all duration-300 cursor-zoom-in
                     ${images[i] 
-                      ? 'border-2 border-slate-200 hover:border-purple-300 hover:shadow-md' 
+                      ? 'border-2 border-slate-200 hover:border-purple-300 hover:shadow-lg hover:scale-105' 
                       : `border-2 border-dashed ${isActive ? 'border-purple-300 bg-purple-50/50' : 'border-slate-200 bg-slate-50'} flex items-center justify-center`}
                   `}
+                  onMouseEnter={() => images[i] && setHoveredImage(images[i])}
+                  onMouseLeave={() => setHoveredImage(null)}
                 >
                   {images[i] ? (
                     <Image 
@@ -282,11 +322,13 @@ function TerminalCard({
                 <div 
                   key={i}
                   className={`
-                    aspect-square rounded-lg overflow-hidden transition-all duration-300
+                    aspect-square rounded-lg overflow-hidden transition-all duration-300 cursor-zoom-in
                     ${images[i] 
-                      ? 'border-2 border-slate-200 hover:border-slate-300 hover:shadow-md' 
+                      ? 'border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg hover:scale-105' 
                       : `border-2 border-dashed ${isActive ? (accentColor === 'purple-500' ? 'border-purple-300 bg-purple-50/50' : accentColor === 'orange-500' ? 'border-orange-300 bg-orange-50/50' : accentColor === 'emerald-500' ? 'border-emerald-300 bg-emerald-50/50' : 'border-cyan-300 bg-cyan-50/50') : 'border-slate-200 bg-slate-50'} flex items-center justify-center`}
                   `}
+                  onMouseEnter={() => images[i] && setHoveredImage(images[i])}
+                  onMouseLeave={() => setHoveredImage(null)}
                 >
                   {images[i] ? (
                     <Image 
@@ -308,6 +350,16 @@ function TerminalCard({
           </>
         )}
       </CardContent>
+      
+      {/* Image Preview Overlay */}
+      <AnimatePresence>
+        {hoveredImage && (
+          <ImagePreview 
+            src={hoveredImage} 
+            alt="Preview" 
+          />
+        )}
+      </AnimatePresence>
     </Card>
   )
 }
