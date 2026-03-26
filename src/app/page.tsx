@@ -127,10 +127,10 @@ function DetailItem({
   return (
     <div 
       className={`
-        p-3 rounded-lg transition-all duration-300 cursor-pointer relative overflow-hidden
+        p-3 rounded-lg transition-all duration-300 cursor-pointer relative overflow-hidden border
         ${isHovered 
-          ? `bg-gradient-to-r ${colors.bg} border ${colors.border} shadow-lg ${colors.glow}` 
-          : 'bg-slate-50 hover:bg-slate-100'}
+          ? `bg-gradient-to-r ${colors.bg} ${colors.border} shadow-lg ${colors.glow}` 
+          : 'bg-slate-50 hover:bg-slate-100 border-transparent'}
       `}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -155,11 +155,9 @@ function DetailItem({
         >
           {detail.label}
         </Badge>
-        {isHovered && (
-          <span className="text-xs animate-pulse opacity-60">
-            ●
-          </span>
-        )}
+        <span className={`text-xs opacity-60 transition-opacity duration-300 ${isHovered ? 'opacity-60' : 'opacity-0'}`}>
+          ●
+        </span>
       </div>
       <p className={`text-sm transition-all duration-300 ${isHovered ? colors.text : 'text-slate-600'}`}>
         {isHovered && typedText ? typedText : detail.content}
@@ -200,10 +198,9 @@ function TerminalCard({
   return (
     <Card 
       className={`
-        relative overflow-hidden cursor-pointer transition-all duration-500 
-        ${isActive ? 'scale-[1.02] shadow-2xl' : 'shadow-lg hover:shadow-xl'}
+        relative overflow-hidden cursor-pointer transition-all duration-300 
+        ${isActive ? 'shadow-2xl border-slate-300' : 'shadow-lg hover:shadow-xl border-slate-200'}
         bg-gradient-to-br from-slate-50 to-white border-2
-        ${isActive ? `border-slate-300` : 'border-slate-200'}
       `}
       onMouseEnter={() => setIsActive(true)}
       onMouseLeave={() => setIsActive(false)}
