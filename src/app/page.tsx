@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import Image from 'next/image'
@@ -128,9 +127,9 @@ function DetailItem({
   return (
     <div 
       className={`
-        p-3 rounded-lg transition-all duration-300 cursor-pointer relative overflow-hidden border
+        p-3 rounded-lg transition-colors duration-200 cursor-pointer relative overflow-hidden border
         ${isHovered 
-          ? `bg-gradient-to-r ${colors.bg} ${colors.border} shadow-lg ${colors.glow}` 
+          ? `bg-gradient-to-r ${colors.bg} ${colors.border}` 
           : 'bg-slate-50 hover:bg-slate-100 border-transparent'}
       `}
       onMouseEnter={() => setIsHovered(true)}
@@ -167,42 +166,6 @@ function DetailItem({
   )
 }
 
-// Image Preview Component
-function ImagePreview({ src, alt }: { src: string; alt: string }) {
-  const content = (
-    <motion.div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-      {/* Image */}
-      <motion.div
-        className="relative z-10 rounded-xl overflow-hidden shadow-2xl"
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.5, opacity: 0 }}
-        transition={{ type: "spring", damping: 25, stiffness: 300 }}
-      >
-        <Image 
-          src={src} 
-          alt={alt}
-          width={800}
-          height={600}
-          className="max-w-[85vw] max-h-[85vh] object-contain rounded-lg"
-          unoptimized
-        />
-      </motion.div>
-    </motion.div>
-  )
-  
-  if (typeof window === 'undefined') return null
-  return createPortal(content, document.body)
-}
-
 // Terminal Card Component
 function TerminalCard({ 
   terminal, 
@@ -222,7 +185,6 @@ function TerminalCard({
   images?: string[]
 }) {
   const [isActive, setIsActive] = useState(false)
-  const [hoveredImage, setHoveredImage] = useState<string | null>(null)
 
   const colorMap: Record<string, { indicator: string; icon: string; header: string }> = {
     'cyan-500': { indicator: 'bg-cyan-400', icon: 'text-cyan-500', header: 'text-cyan-600' },
@@ -256,9 +218,7 @@ function TerminalCard({
       </div>
 
       {/* Active indicator */}
-      {isActive && (
-        <div className={`absolute top-0 right-0 w-2 h-full ${colors.indicator} animate-pulse`} />
-      )}
+      <div className={`absolute top-0 right-0 w-2 h-full ${colors.indicator} transition-opacity duration-300 ${isActive ? 'opacity-100' : 'opacity-0'}`} />
 
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-lg">
@@ -277,13 +237,11 @@ function TerminalCard({
                 <div 
                   key={i}
                   className={`
-                    w-20 h-20 rounded-lg overflow-hidden transition-all duration-300 cursor-zoom-in
+                    w-20 h-20 rounded-lg overflow-hidden transition-all duration-300
                     ${images[i] 
-                      ? 'border-2 border-slate-200 hover:border-purple-300 hover:shadow-lg hover:scale-105' 
+                      ? 'border-2 border-slate-200' 
                       : `border-2 border-dashed ${isActive ? 'border-purple-300 bg-purple-50/50' : 'border-slate-200 bg-slate-50'} flex items-center justify-center`}
                   `}
-                  onMouseEnter={() => images[i] && setHoveredImage(images[i])}
-                  onMouseLeave={() => setHoveredImage(null)}
                 >
                   {images[i] ? (
                     <Image 
@@ -322,13 +280,11 @@ function TerminalCard({
                 <div 
                   key={i}
                   className={`
-                    aspect-square rounded-lg overflow-hidden transition-all duration-300 cursor-zoom-in
+                    aspect-square rounded-lg overflow-hidden transition-all duration-300
                     ${images[i] 
-                      ? 'border-2 border-slate-200 hover:border-slate-300 hover:shadow-lg hover:scale-105' 
+                      ? 'border-2 border-slate-200' 
                       : `border-2 border-dashed ${isActive ? (accentColor === 'purple-500' ? 'border-purple-300 bg-purple-50/50' : accentColor === 'orange-500' ? 'border-orange-300 bg-orange-50/50' : accentColor === 'emerald-500' ? 'border-emerald-300 bg-emerald-50/50' : 'border-cyan-300 bg-cyan-50/50') : 'border-slate-200 bg-slate-50'} flex items-center justify-center`}
                   `}
-                  onMouseEnter={() => images[i] && setHoveredImage(images[i])}
-                  onMouseLeave={() => setHoveredImage(null)}
                 >
                   {images[i] ? (
                     <Image 
@@ -350,16 +306,6 @@ function TerminalCard({
           </>
         )}
       </CardContent>
-      
-      {/* Image Preview Overlay */}
-      <AnimatePresence>
-        {hoveredImage && (
-          <ImagePreview 
-            src={hoveredImage} 
-            alt="Preview" 
-          />
-        )}
-      </AnimatePresence>
     </Card>
   )
 }
@@ -1109,7 +1055,7 @@ export default function Home() {
 
           {/* Main Title with Glitch Effect */}
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">
-            <GlitchText text="TEAM 6353" />
+            <GlitchText text="EFZ Robotics-6353" />
             <span className="block mt-2 text-3xl md:text-4xl lg:text-5xl font-light text-slate-500">
               <GlitchText text=": REBUILT" />
             </span>
