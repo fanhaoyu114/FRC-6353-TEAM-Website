@@ -48,4 +48,11 @@ prompt
 
 server.log
 # Skills directory
-/skills/
+/skills/upload/
+
+# Project specific
+upload/
+skills/
+download/
+*.pyc
+__pycache__/

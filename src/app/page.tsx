@@ -175,7 +175,8 @@ function TerminalCard({
   details, 
   icon: Icon,
   accentColor,
-  layout = 'default'
+  layout = 'default',
+  images = []
 }: { 
   terminal: string
   title: string
@@ -183,6 +184,7 @@ function TerminalCard({
   icon: React.ElementType
   accentColor: string
   layout?: 'default' | 'horizontal'
+  images?: string[]
 }) {
   const [isActive, setIsActive] = useState(false)
 
@@ -234,20 +236,32 @@ function TerminalCard({
         {layout === 'horizontal' ? (
           // Horizontal layout for Terminal D
           <div className="flex">
-            {/* Left side: Image placeholders */}
+            {/* Left side: Images */}
             <div className="flex flex-col gap-3 p-4 border-r border-dashed border-slate-200 min-w-[100px]">
-              {[1, 2, 3].map((i) => (
+              {[0, 1, 2].map((i) => (
                 <div 
                   key={i}
                   className={`
-                    w-20 h-20 rounded-lg border-2 border-dashed transition-all duration-300
-                    ${isActive ? 'border-purple-300 bg-purple-50/50' : 'border-slate-200 bg-slate-50'}
-                    flex items-center justify-center
+                    w-20 h-20 rounded-lg overflow-hidden transition-all duration-300
+                    ${images[i] 
+                      ? 'border-2 border-slate-200 hover:border-purple-300 hover:shadow-md' 
+                      : `border-2 border-dashed ${isActive ? 'border-purple-300 bg-purple-50/50' : 'border-slate-200 bg-slate-50'} flex items-center justify-center`}
                   `}
                 >
-                  <span className={`text-xs font-mono ${isActive ? 'text-purple-400' : 'text-slate-300'}`}>
-                    IMG_{i}
-                  </span>
+                  {images[i] ? (
+                    <Image 
+                      src={images[i]} 
+                      alt={`${terminal} image ${i + 1}`}
+                      width={80}
+                      height={80}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className={`text-xs font-mono ${isActive ? 'text-purple-400' : 'text-slate-300'}`}>
+                      IMG_{i + 1}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -265,20 +279,32 @@ function TerminalCard({
               <DetailItem key={index} detail={detail} accentColor={accentColor} />
             ))}
 
-            {/* Placeholder slots */}
+            {/* Image slots */}
             <div className="grid grid-cols-3 gap-2 mt-4">
-              {[1, 2, 3].map((i) => (
+              {[0, 1, 2].map((i) => (
                 <div 
                   key={i}
                   className={`
-                    aspect-square rounded-lg border-2 border-dashed transition-all duration-300
-                    ${isActive ? (accentColor === 'purple-500' ? 'border-purple-300 bg-purple-50/50' : accentColor === 'orange-500' ? 'border-orange-300 bg-orange-50/50' : accentColor === 'emerald-500' ? 'border-emerald-300 bg-emerald-50/50' : 'border-cyan-300 bg-cyan-50/50') : 'border-slate-200 bg-slate-50'}
-                    flex items-center justify-center
+                    aspect-square rounded-lg overflow-hidden transition-all duration-300
+                    ${images[i] 
+                      ? 'border-2 border-slate-200 hover:border-slate-300 hover:shadow-md' 
+                      : `border-2 border-dashed ${isActive ? (accentColor === 'purple-500' ? 'border-purple-300 bg-purple-50/50' : accentColor === 'orange-500' ? 'border-orange-300 bg-orange-50/50' : accentColor === 'emerald-500' ? 'border-emerald-300 bg-emerald-50/50' : 'border-cyan-300 bg-cyan-50/50') : 'border-slate-200 bg-slate-50'} flex items-center justify-center`}
                   `}
                 >
-                  <span className={`text-xs font-mono ${isActive ? (accentColor === 'purple-500' ? 'text-purple-400' : accentColor === 'orange-500' ? 'text-orange-400' : accentColor === 'emerald-500' ? 'text-emerald-400' : 'text-cyan-400') : 'text-slate-300'}`}>
-                    IMG_{i}
-                  </span>
+                  {images[i] ? (
+                    <Image 
+                      src={images[i]} 
+                      alt={`${terminal} image ${i + 1}`}
+                      width={120}
+                      height={120}
+                      className="w-full h-full object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    <span className={`text-xs font-mono ${isActive ? (accentColor === 'purple-500' ? 'text-purple-400' : accentColor === 'orange-500' ? 'text-orange-400' : accentColor === 'emerald-500' ? 'text-emerald-400' : 'text-cyan-400') : 'text-slate-300'}`}>
+                      IMG_{i + 1}
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
@@ -437,32 +463,75 @@ function SustainabilityCard({
 
 // Positive Cycle Engine Component with Framer Motion
 function PositiveCycleEngine() {
+  const [isHovered, setIsHovered] = useState(false)
+  const [activeNode, setActiveNode] = useState<number | null>(null)
+  
   const nodes = [
-    { label: 'Funding', icon: DollarSign, color: 'from-emerald-400 to-teal-500' },
-    { label: 'Results', icon: TrendingUp, color: 'from-cyan-400 to-blue-500' },
-    { label: 'New Members', icon: Users, color: 'from-orange-400 to-amber-500' },
+    { label: 'Funding', icon: DollarSign, color: 'from-emerald-400 to-teal-500', description: 'Financial resources enable team growth' },
+    { label: 'Results', icon: TrendingUp, color: 'from-cyan-400 to-blue-500', description: 'Achievements attract new opportunities' },
+    { label: 'New Members', icon: Users, color: 'from-orange-400 to-amber-500', description: 'Talent drives continued success' },
   ]
 
   return (
-    <div className="relative w-full h-full min-h-[550px] flex items-center justify-center">
-      <div className="relative w-80 h-80">
+    <div 
+      className="relative w-full h-full min-h-[550px] flex items-center justify-center"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <motion.div 
+        className="relative"
+        initial={{ width: 320, height: 320 }}
+        animate={{ 
+          width: isHovered ? 400 : 320, 
+          height: isHovered ? 400 : 320 
+        }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+      {/* Background glow */}
+      <motion.div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: 'radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, transparent 70%)',
+        }}
+        animate={isHovered ? {
+          scale: [1, 1.2, 1],
+          opacity: [0.5, 0.8, 0.5]
+        } : {}}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      
       {/* Central circle with glow */}
       <div className="absolute inset-0 flex items-center justify-center">
         <motion.div 
-          className="relative w-36 h-36 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-2xl"
+          className="relative w-44 h-44 rounded-full bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center shadow-2xl"
           initial={{ scale: 0.8, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          animate={{ scale: isHovered ? 1.1 : 1, opacity: 1 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          whileHover={{ scale: 1.15 }}
         >
+          {/* Inner rotating gradient */}
           <motion.div
-            className="absolute inset-1 rounded-full bg-gradient-to-br from-slate-700 to-slate-800"
+            className="absolute inset-2 rounded-full bg-gradient-to-br from-slate-700 to-slate-800"
             animate={{ rotate: 360 }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           />
+          
+          {/* Pulsing rings inside */}
+          <motion.div
+            className="absolute inset-4 rounded-full border border-cyan-400/30"
+            animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+          
           <div className="relative z-10 text-center px-4">
-            <Zap className="w-7 h-7 text-cyan-400 mx-auto mb-1" />
-            <span className="text-white text-[10px] font-bold tracking-wider">THE POSITIVE</span>
-            <span className="block text-cyan-400 text-xs font-bold tracking-wider">CYCLE ENGINE</span>
+            <motion.div
+              animate={isHovered ? { rotate: [0, 10, -10, 0] } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              <Zap className="w-10 h-10 text-cyan-400 mx-auto mb-2" />
+            </motion.div>
+            <span className="text-white text-xs font-bold tracking-wider">THE POSITIVE</span>
+            <span className="block text-cyan-400 text-sm font-bold tracking-wider">CYCLE ENGINE</span>
           </div>
         </motion.div>
       </div>
@@ -475,7 +544,15 @@ function PositiveCycleEngine() {
             <stop offset="50%" stopColor="#22d3ee" stopOpacity="1" />
             <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.2" />
           </linearGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+            <feMerge>
+              <feMergeNode in="coloredBlur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
+        
         {/* Outer ring path */}
         <circle 
           cx="200" cy="200" r="150" 
@@ -486,34 +563,38 @@ function PositiveCycleEngine() {
           className="animate-spin"
           style={{ transformOrigin: 'center', animationDuration: '30s' }}
         />
+        
         {/* Glowing trace */}
         <motion.circle 
           cx="200" cy="200" r="150" 
           fill="none" 
           stroke="#22d3ee" 
-          strokeWidth="3"
+          strokeWidth={isHovered ? 4 : 3}
           strokeDasharray="50 900"
           strokeLinecap="round"
+          filter="url(#glow)"
           animate={{ strokeDashoffset: [-950, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
         />
-        {/* Particle dots */}
-        {[0, 120, 240].map((angle, i) => (
+        
+        {/* Particle dots - more particles when hovered */}
+        {(isHovered ? [0, 60, 120, 180, 240, 300] : [0, 120, 240]).map((angle, i) => (
           <motion.circle
             key={i}
-            r="4"
+            r={isHovered ? 5 : 4}
             fill="#22d3ee"
+            filter="url(#glow)"
             initial={{ opacity: 0 }}
             animate={{ 
               opacity: [0, 1, 0],
-              cx: [200 + 150 * Math.cos((angle * Math.PI) / 180), 200 + 150 * Math.cos(((angle + 120) * Math.PI) / 180)],
-              cy: [200 + 150 * Math.sin((angle * Math.PI) / 180), 200 + 150 * Math.sin(((angle + 120) * Math.PI) / 180)]
+              cx: [200 + 150 * Math.cos((angle * Math.PI) / 180), 200 + 150 * Math.cos(((angle + 60) * Math.PI) / 180)],
+              cy: [200 + 150 * Math.sin((angle * Math.PI) / 180), 200 + 150 * Math.sin(((angle + 60) * Math.PI) / 180)]
             }}
             transition={{ 
-              duration: 4, 
+              duration: isHovered ? 2 : 4, 
               repeat: Infinity, 
               ease: "linear",
-              delay: i * 1.3
+              delay: i * 0.3
             }}
           />
         ))}
@@ -525,6 +606,7 @@ function PositiveCycleEngine() {
         const x = 50 + 35 + 30 * Math.cos(angle)
         const y = 50 + 35 + 30 * Math.sin(angle)
         const Icon = node.icon
+        const isActive = activeNode === index
         
         return (
           <motion.div
@@ -540,23 +622,49 @@ function PositiveCycleEngine() {
             transition={{ delay: 0.3 + index * 0.2, duration: 0.5 }}
           >
             <motion.div 
-              className={`w-20 h-20 rounded-full bg-gradient-to-br ${node.color} flex items-center justify-center shadow-lg cursor-pointer`}
-              whileHover={{ scale: 1.1 }}
+              className={`w-24 h-24 rounded-full bg-gradient-to-br ${node.color} flex items-center justify-center shadow-lg cursor-pointer relative`}
+              whileHover={{ scale: 1.2 }}
               animate={{ 
-                boxShadow: ['0 0 20px rgba(34, 211, 238, 0.3)', '0 0 40px rgba(34, 211, 238, 0.5)', '0 0 20px rgba(34, 211, 238, 0.3)']
+                boxShadow: isActive 
+                  ? ['0 0 30px rgba(34, 211, 238, 0.6)', '0 0 50px rgba(34, 211, 238, 0.8)', '0 0 30px rgba(34, 211, 238, 0.6)']
+                  : ['0 0 20px rgba(34, 211, 238, 0.3)', '0 0 40px rgba(34, 211, 238, 0.5)', '0 0 20px rgba(34, 211, 238, 0.3)']
               }}
-              transition={{ duration: 2, repeat: Infinity }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              onHoverStart={() => setActiveNode(index)}
+              onHoverEnd={() => setActiveNode(null)}
             >
-              <Icon className="w-8 h-8 text-white" />
+              <Icon className="w-10 h-10 text-white" />
+              
+              {/* Active indicator ring */}
+              {isActive && (
+                <motion.div
+                  className="absolute inset-0 rounded-full border-2 border-white/50"
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                />
+              )}
             </motion.div>
+            
+            {/* Label */}
             <motion.span 
-              className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs font-semibold text-slate-600 whitespace-nowrap"
+              className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-sm font-semibold text-slate-600 whitespace-nowrap"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 + index * 0.2 }}
             >
               {node.label}
             </motion.span>
+            
+            {/* Description tooltip on hover */}
+            <motion.div
+              className="absolute -top-16 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-xs px-3 py-2 rounded-lg whitespace-nowrap"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {node.description}
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2 h-2 bg-slate-800 rotate-45" />
+            </motion.div>
           </motion.div>
         )
       })}
@@ -575,8 +683,8 @@ function PositiveCycleEngine() {
                   Q ${200 + 130 * Math.cos(midAngle)} ${200 + 130 * Math.sin(midAngle)}
                   ${200 + 100 * Math.cos(endAngle)} ${200 + 100 * Math.sin(endAngle)}`}
               fill="none"
-              stroke="#94a3b8"
-              strokeWidth="1.5"
+              stroke={isHovered ? "#22d3ee" : "#94a3b8"}
+              strokeWidth={isHovered ? 2.5 : 1.5}
               strokeDasharray="4 4"
               initial={{ pathLength: 0 }}
               animate={{ pathLength: 1 }}
@@ -585,7 +693,7 @@ function PositiveCycleEngine() {
           )
         })}
       </svg>
-      </div>
+      </motion.div>
     </div>
   )
 }
@@ -704,8 +812,54 @@ function FundingUsageChart({ data }: { data: { name: string; value: number; colo
 }
 
 // Team Member Card Component - Square Design
-function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index: number; role: string; isCaptain: boolean }) {
+function TeamMemberCard({ name, index, role, isCaptain, colorTheme = 'default', photo }: { name: string; index: number; role: string; isCaptain: boolean; colorTheme?: 'default' | 'purple' | 'yellow'; photo?: string }) {
   const [isHovered, setIsHovered] = useState(false)
+
+  // Color schemes
+  const colorSchemes = {
+    default: {
+      glow: 'bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 blur-md',
+      card: 'bg-white border-slate-100 shadow-md',
+      badge: 'bg-gradient-to-r from-cyan-400 to-teal-500',
+      photoBorder: 'border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100',
+      nameHover: 'text-cyan-600',
+      roleColor: 'text-slate-400',
+      hoverRing: 'ring-cyan-200',
+      scanLine: 'via-cyan-400'
+    },
+    purple: {
+      glow: 'bg-gradient-to-r from-purple-400 via-violet-400 to-indigo-400 blur-md',
+      card: 'bg-gradient-to-br from-purple-50 to-violet-50 border-purple-200 shadow-md shadow-purple-100',
+      badge: 'bg-gradient-to-r from-purple-400 to-violet-500',
+      photoBorder: 'border-purple-300 bg-gradient-to-br from-purple-100 to-violet-100',
+      nameHover: 'text-purple-600',
+      roleColor: 'text-purple-400',
+      hoverRing: 'ring-purple-200',
+      scanLine: 'via-purple-400'
+    },
+    yellow: {
+      glow: 'bg-gradient-to-r from-yellow-300 via-amber-300 to-orange-300 blur-md',
+      card: 'bg-gradient-to-br from-yellow-50 to-amber-50 border-yellow-200 shadow-md shadow-yellow-100',
+      badge: 'bg-gradient-to-r from-yellow-400 to-amber-400',
+      photoBorder: 'border-yellow-300 bg-gradient-to-br from-yellow-100 to-amber-100',
+      nameHover: 'text-amber-600',
+      roleColor: 'text-amber-500',
+      hoverRing: 'ring-yellow-200',
+      scanLine: 'via-amber-400'
+    },
+    captain: {
+      glow: 'bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 blur-md',
+      card: 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 shadow-lg shadow-amber-100',
+      badge: 'bg-gradient-to-r from-amber-400 to-orange-500',
+      photoBorder: 'border-amber-300 bg-gradient-to-br from-amber-100 to-orange-100',
+      nameHover: 'text-orange-600',
+      roleColor: 'text-amber-500 font-medium',
+      hoverRing: 'ring-amber-200',
+      scanLine: 'via-amber-400'
+    }
+  }
+
+  const colors = isCaptain ? colorSchemes.captain : colorSchemes[colorTheme]
 
   return (
     <div
@@ -721,9 +875,7 @@ function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index:
         className={`
           absolute -inset-1 rounded-xl opacity-0 transition-opacity duration-300
           ${isHovered ? 'opacity-100' : ''}
-          ${isCaptain 
-            ? 'bg-gradient-to-r from-amber-400 via-orange-400 to-red-400 blur-md' 
-            : 'bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 blur-md'}
+          ${colors.glow}
         `}
       />
 
@@ -731,17 +883,13 @@ function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index:
         relative aspect-square w-full rounded-lg border-2 overflow-hidden
         flex flex-col items-center justify-center p-4
         transition-all duration-300
-        ${isCaptain 
-          ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-amber-200 shadow-lg shadow-amber-100' 
-          : 'bg-white border-slate-100 shadow-md'}
+        ${colors.card}
       `}>
         {/* Digital ID badge - Top Right */}
         <div className={`
           absolute top-2 right-2 w-7 h-7 rounded-full flex items-center justify-center
           text-sm font-mono font-bold text-white
-          ${isCaptain 
-            ? 'bg-gradient-to-r from-amber-400 to-orange-500' 
-            : 'bg-gradient-to-r from-cyan-400 to-teal-500'}
+          ${colors.badge}
         `}>
           {String(index).padStart(2, '0')}
         </div>
@@ -749,18 +897,16 @@ function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index:
         {/* Photo Placeholder - Square */}
         <div className={`
           w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300
-          ${isHovered ? 'ring-2 ring-cyan-200 ring-offset-2 scale-105' : ''}
-          ${isCaptain 
-            ? 'border-amber-300 bg-gradient-to-br from-amber-100 to-orange-100' 
-            : 'border-slate-200 bg-gradient-to-br from-slate-50 to-slate-100'}
+          ${isHovered ? `ring-2 ${colors.hoverRing} ring-offset-2 scale-105` : ''}
+          ${colors.photoBorder}
           flex items-center justify-center flex-shrink-0
         `}>
           <Image 
-            src="/avatar-placeholder.png" 
+            src={photo || "/avatar-placeholder.png"} 
             alt={name}
             width={80}
             height={80}
-            className="w-full h-full object-cover opacity-70"
+            className={`w-full h-full object-cover ${photo ? '' : 'opacity-70'}`}
             unoptimized
           />
         </div>
@@ -768,7 +914,7 @@ function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index:
         {/* Name */}
         <p className={`
           font-semibold text-sm mt-3 text-center transition-colors duration-300
-          ${isHovered ? 'text-cyan-600' : 'text-slate-700'}
+          ${isHovered ? colors.nameHover : 'text-slate-700'}
         `}>
           {name}
         </p>
@@ -776,7 +922,7 @@ function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index:
         {/* Role */}
         <p className={`
           text-xs mt-1 text-center transition-colors duration-300 leading-tight
-          ${isCaptain ? 'text-amber-500 font-medium' : 'text-slate-400'}
+          ${colors.roleColor}
         `}>
           {role}
         </p>
@@ -790,7 +936,7 @@ function TeamMemberCard({ name, index, role, isCaptain }: { name: string; index:
         {/* Scan line effect on hover */}
         {isHovered && (
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent animate-scan-vertical" />
+            <div className={`absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent ${colors.scanLine} to-transparent animate-scan-vertical`} />
           </div>
         )}
       </div>
@@ -810,23 +956,24 @@ export default function Home() {
   }, [])
 
   const teamMembers = [
-    { name: 'Fan Haoyu', role: 'Website Developer', isCaptain: false },
-    { name: 'Jiang Shan', role: 'Driver', isCaptain: false },
-    { name: 'Zhang Yisen', role: 'Engineering Leader', isCaptain: false },
-    { name: 'Shi Jincheng', role: 'Captain', isCaptain: true },
-    { name: 'Jin Yinuo', role: 'Vice-Captain', isCaptain: false },
-    { name: 'Wu Yueyang', role: 'Vice-Captain', isCaptain: false },
-    { name: 'Huang Xingning', role: 'Intelligencer', isCaptain: false },
-    { name: 'Bian Zheyu', role: 'Player', isCaptain: false },
-    { name: 'Hu Gaoxuan', role: 'Programmer', isCaptain: false },
-    { name: 'Zhou Xingyu', role: 'Programmer', isCaptain: false },
-    { name: 'Yang Jiahe', role: 'Driver', isCaptain: false },
-    { name: 'Xu Chuqiao', role: 'Coach', isCaptain: false },
-    { name: 'Zou Chucheng', role: 'Programmer', isCaptain: false },
-    { name: 'Xia Xikai', role: 'Human Player', isCaptain: false },
-    { name: 'Jiang Siyu', role: 'Player', isCaptain: false },
-    { name: 'Wu Hao', role: 'Programmer', isCaptain: false },
-    { name: 'Cui Tianchang', role: 'Programmer', isCaptain: false },
+    { name: 'Fan Haoyu', role: 'Website Developer', isCaptain: false, colorTheme: 'purple' as const, photo: '/member-01.png' },
+    { name: 'Jiang Shan', role: 'Driver', isCaptain: false, photo: '/member-02.png' },
+    { name: 'Zhang Yisen', role: 'Engineering Leader', isCaptain: false, photo: '/member-03.png' },
+    { name: 'Shi Jincheng', role: 'Captain', isCaptain: true, photo: '/member-04.png' },
+    { name: 'Jin Yinuo', role: 'Vice-Captain', isCaptain: false, colorTheme: 'yellow' as const, photo: '/member-05.png' },
+    { name: 'Wu Yueyang', role: 'Vice-Captain', isCaptain: false, colorTheme: 'yellow' as const, photo: '/member-06.png' },
+    { name: 'Huang Xingning', role: 'Intelligencer', isCaptain: false, photo: '/member-07.png' },
+    { name: 'Bian Zheyu', role: 'Player', isCaptain: false, photo: '/member-08.png' },
+    { name: 'Hu Gaoxuan', role: 'Programmer', isCaptain: false, photo: '/member-09.png' },
+    { name: 'Zhou Xingyu', role: 'Programmer', isCaptain: false, photo: '/member-10.png' },
+    { name: 'Yang Jiahe', role: 'Driver', isCaptain: false, photo: '/member-11.png' },
+    { name: 'Xu Chuqiao', role: 'Coach', isCaptain: false, photo: '/member-12.png' },
+    { name: 'Zou Chucheng', role: 'Programmer', isCaptain: false, photo: '/member-13.png' },
+    { name: 'Xia Xikai', role: 'Human Player', isCaptain: false, photo: '/member-14.png' },
+    { name: 'Jiang Siyu', role: 'Player', isCaptain: false, photo: '/member-15.png' },
+    { name: 'Wu Hao', role: 'Programmer', isCaptain: false, photo: '/member-16.png' },
+    { name: 'Cui Tianchang', role: 'Programmer', isCaptain: false, photo: '/member-17.png' },
+    { name: 'Xujia', role: 'Engineering', isCaptain: false, photo: '/member-18.png' },
   ]
 
   return (
@@ -927,11 +1074,17 @@ export default function Home() {
             "We redefine the boundary between simplicity and power."
           </p>
 
-          {/* Team Photo Placeholder */}
+          {/* Team Photo */}
           <div className="relative max-w-3xl mx-auto">
-            <div className="aspect-video rounded-2xl border-2 border-dashed border-cyan-300 bg-gradient-to-br from-cyan-50 to-slate-50 flex flex-col items-center justify-center gap-4 shadow-lg">
-              <Users className="w-16 h-16 text-cyan-300" />
-              <span className="text-cyan-400 font-mono text-lg">[TEAM GROUP PHOTO PLACEHOLDER]</span>
+            <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl shadow-cyan-200/30 border-2 border-cyan-200">
+              <Image 
+                src="/hero-team-photo.jpg" 
+                alt="TEAM 6353 Group Photo" 
+                fill
+                className="object-cover"
+                priority
+                unoptimized
+              />
             </div>
             
             {/* Decorative corners */}
@@ -973,6 +1126,7 @@ export default function Home() {
               title="Campus Integration"
               icon={GraduationCap}
               accentColor="cyan-500"
+              images={['/terminal-a-1.png', '/terminal-a-2.png', '/terminal-a-3.jpg']}
               details={[
                 { label: 'MENTORING', content: 'Mentoring Qiu Chengtong Class (Top STEM students) - guiding the next generation of engineers' },
                 { label: 'EVENTS', content: 'Campus Open Days - Showcasing innovation to prospective students and families' },
@@ -985,6 +1139,7 @@ export default function Home() {
               title="Global Connectivity"
               icon={Globe}
               accentColor="orange-500"
+              images={['/terminal-b-1.jpg', '/terminal-b-2.jpg', '/terminal-b-3.jpg']}
               details={[
                 { label: 'MENTORSHIP', content: 'Cross-border mentorship for Team 11429 (Australia) - sharing expertise across continents' },
                 { label: 'EXCHANGE', content: 'Collaborative exchange with American Team 2718 (hosted by them)' },
@@ -997,6 +1152,7 @@ export default function Home() {
               title="Social Outreach"
               icon={Handshake}
               accentColor="emerald-500"
+              images={['/terminal-c-1.jpg', '/terminal-c-2.jpg', '/terminal-c-3.jpg']}
               details={[
                 { label: 'EDUCATION', content: 'STEM enlightenment for Zhangjiang Kindergarten - inspiring young minds' },
                 { label: 'INDUSTRY', content: 'Industry visits to Fourier Intelligence - Connecting classroom to real-world applications' },
@@ -1013,6 +1169,7 @@ export default function Home() {
               icon={PartyPopper}
               accentColor="purple-500"
               layout="horizontal"
+              images={['/terminal-d-1.png', '/terminal-d-2.png', '/terminal-d-3.png']}
               details={[
                 { label: 'EXPERT INSIGHT', content: 'Google engineer joins us on-site, sharing cutting-edge technology insights and industry perspectives — a rare opportunity for face-to-face dialogue that sparks innovation.' },
                 { label: 'ALUMNI DIALOG', content: 'A UC Berkeley alumna engages the team with thought-provoking questions, bringing an international perspective and fostering deep conversations that open new horizons.' },
@@ -1160,10 +1317,11 @@ export default function Home() {
                 index={index + 1}
                 role={member.role}
                 isCaptain={member.isCaptain}
+                colorTheme={member.colorTheme}
+                photo={member.photo}
               />
             ))}
-            {/* Empty placeholders to center the last row (17 members, 6 columns = 5 in last row, need 1 placeholder) */}
-            <div className="hidden xl:block" />
+            {/* Empty placeholders to center the last row (18 members, 6 columns = 3 full rows, no placeholder needed) */}
           </div>
         </div>
       </section>
@@ -1189,7 +1347,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-lg bg-cyan-500/20 flex items-center justify-center">
                     <Mail className="w-5 h-5 text-cyan-400" />
                   </div>
-                  <h3 className="font-semibold text-lg">Contact</h3>
+                  <h3 className="font-semibold text-lg text-cyan-400">Contact</h3>
                 </div>
                 <a href="mailto:fanhaoyu@hsefz.cn" className="text-cyan-300 hover:text-cyan-200 transition-colors">
                   fanhaoyu@hsefz.cn
@@ -1204,10 +1362,17 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
                     <MessageCircle className="w-5 h-5 text-emerald-400" />
                   </div>
-                  <h3 className="font-semibold text-lg">WeChat</h3>
+                  <h3 className="font-semibold text-lg text-white">WeChat</h3>
                 </div>
-                <div className="w-24 h-24 rounded-lg border-2 border-dashed border-white/30 flex items-center justify-center">
-                  <span className="text-white/40 font-mono text-xs">QR CODE</span>
+                <div className="w-24 h-24 rounded-lg overflow-hidden border-2 border-white/20">
+                  <Image 
+                    src="/wechat-qr.jpg" 
+                    alt="WeChat QR Code"
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-cover"
+                    unoptimized
+                  />
                 </div>
               </CardContent>
             </Card>
@@ -1219,7 +1384,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-lg bg-orange-500/20 flex items-center justify-center">
                     <MapPin className="w-5 h-5 text-orange-400" />
                   </div>
-                  <h3 className="font-semibold text-lg">Location</h3>
+                  <h3 className="font-semibold text-lg text-white">Location</h3>
                 </div>
                 <p className="text-white/70">Shanghai, China</p>
                 <p className="text-white/50 text-sm mt-2">No.2 High School of East China Normal University</p>
@@ -1233,7 +1398,7 @@ export default function Home() {
                   <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
                     <ExternalLink className="w-5 h-5 text-purple-400" />
                   </div>
-                  <h3 className="font-semibold text-lg">School Website</h3>
+                  <h3 className="font-semibold text-lg text-purple-400">School Website</h3>
                 </div>
                 <a 
                   href="https://www.hsefz.cn/" 
@@ -1242,20 +1407,10 @@ export default function Home() {
                   className="text-purple-300 hover:text-purple-200 transition-colors flex items-center gap-1"
                 >
                   www.hsefz.cn
-                  <ExternalLink className="w-4 h-4" />
+                  <ExternalLink className="w-3 h-3" />
                 </a>
               </CardContent>
             </Card>
-          </div>
-
-          {/* Additional Placeholders */}
-          <div className="flex justify-center gap-6 mt-12">
-            <div className="w-16 h-16 rounded-lg border-2 border-dashed border-white/20 flex items-center justify-center">
-              <span className="text-white/30 font-mono text-xs">IMG</span>
-            </div>
-            <div className="w-16 h-16 rounded-lg border-2 border-dashed border-white/20 flex items-center justify-center">
-              <span className="text-white/30 font-mono text-xs">IMG</span>
-            </div>
           </div>
 
           {/* Copyright */}
