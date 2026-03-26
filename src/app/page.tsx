@@ -1057,7 +1057,7 @@ export default function Home() {
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 tracking-tight">
             <GlitchText text="EFZ Robotics-6353" />
             <span className="block mt-2 text-3xl md:text-4xl lg:text-5xl font-light text-slate-500">
-              <GlitchText text=": REBUILT" />
+              <GlitchText text="——REBUILT——" />
             </span>
           </h1>
 
