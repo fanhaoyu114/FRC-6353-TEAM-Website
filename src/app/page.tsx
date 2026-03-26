@@ -129,7 +129,7 @@ function DetailItem({
       className={`
         p-3 rounded-lg transition-all duration-300 cursor-pointer relative overflow-hidden
         ${isHovered 
-          ? `bg-gradient-to-r ${colors.bg} border ${colors.border} shadow-lg ${colors.glow} -translate-y-0.5` 
+          ? `bg-gradient-to-r ${colors.bg} border ${colors.border} shadow-lg ${colors.glow}` 
           : 'bg-slate-50 hover:bg-slate-100'}
       `}
       onMouseEnter={() => setIsHovered(true)}
@@ -375,7 +375,7 @@ function SustainabilityCard({
         className={`
           relative overflow-hidden border-l-4 ${colors.border}
           transition-all duration-500 ease-out
-          ${isHovered ? 'shadow-2xl scale-[1.02] -translate-y-1' : 'shadow-lg'}
+          ${isHovered ? 'shadow-2xl scale-[1.02]' : 'shadow-lg'}
         `}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
