@@ -920,12 +920,14 @@ function TeamMemberCard({ name, index, role, isCaptain, colorTheme = 'default', 
         </p>
         
         {/* Role */}
-        <p className={`
-          text-xs mt-1 text-center transition-colors duration-300 leading-tight
-          ${colors.roleColor}
-        `}>
-          {role}
-        </p>
+        {!isCaptain && (
+          <p className={`
+            text-xs mt-1 text-center transition-colors duration-300 leading-tight
+            ${colors.roleColor}
+          `}>
+            {role}
+          </p>
+        )}
         
         {isCaptain && (
           <Badge className="mt-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-[10px] px-2 py-0.5">
@@ -959,7 +961,7 @@ export default function Home() {
     { name: 'Fan Haoyu', role: 'Website Developer', isCaptain: false, colorTheme: 'purple' as const, photo: '/member-01.png' },
     { name: 'Jiang Shan', role: 'Driver', isCaptain: false, photo: '/member-02.png' },
     { name: 'Zhang Yisen', role: 'Engineering Leader', isCaptain: false, photo: '/member-03.png' },
-    { name: 'Shi Jincheng', role: 'Captain', isCaptain: true, photo: '/member-04.png' },
+    { name: 'Max Shi', role: 'Captain', isCaptain: true, photo: '/member-04.png' },
     { name: 'Jin Yinuo', role: 'Vice-Captain', isCaptain: false, colorTheme: 'yellow' as const, photo: '/member-05.png' },
     { name: 'Wu Yueyang', role: 'Vice-Captain', isCaptain: false, colorTheme: 'yellow' as const, photo: '/member-06.png' },
     { name: 'Huang Xingning', role: 'Intelligencer', isCaptain: false, photo: '/member-07.png' },
